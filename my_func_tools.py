@@ -1,53 +1,51 @@
+# Асинхронный веб-скраппер для извлечения данных с веб-страниц
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup as bs
 
-
-
+# Функция для получения HTML-кода страницы
 async def srappers(url: str):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             if response.status == 200:
                 return await response.text()
 
-
+# Функция для извлечения ссылок на статьи с веб-страницы
 async def soup_text(sites: str):
-    data = []
     soup = bs(sites, 'lxml')
-    url_detailed = soup.find_all('a', class_='tm-title__link')
-    for url in url_detailed:
-        new = f"https://habr.com{url.get('href')}"
-        data.append(new)
+    url_detailed = soup.select('a.tm-title__link')
+    data = [f"https://habr.com{url.get('href')}" for url in url_detailed]
     return data
 
+# Функция для получения данных со страницы статьи
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                return await response.text()
 
+# Функция для обработки каждой страницы статьи
+async def process_page(url):
+    data = await fetch_data(url)
+    soup = bs(data, 'lxml')
+    words = soup.select_one('div.tm-article-presenter')
+    header = words.find('h1').text
+    text = [i.text for i in soup.select('p')]
+    dat_parse = {'header': header, 'text': text}
+    return dat_parse
 
+# Основная функция для выполнения всего процесса
 async def main(url: str):
     sites_dat = []
     sites_data = await srappers(url)
     data = await soup_text(sites_data)
-    coros = [srappers(i) for i in data]
-    for task in asyncio.as_completed(coros):
-        words = await task
-        soup = bs(words, 'lxml')
-        words = soup.find('div', class_='tm-article-presenter')
-        header = words.find('h1').text
-        text = soup.find_all('p')
-        lst = []
-        for i in text:
-            lst.append(i.text)
-        dat_parse = {'header': header, 'text': lst}
-        sites_dat.append(dat_parse)
+    coros = [process_page(i) for i in data]
+    results = await asyncio.gather(*coros)
+    sites_dat.extend(results)
     return sites_dat
-        
-        
-
-  
-    
-
 
 if __name__ == "__main__":
-    answ = 'pyhon'
+    answ = 'python'
     URL = rf'https://habr.com/ru/search/?q={answ}&target_type=posts&order=relevance'
-    asyncio.run(main(URL))
-    
+    date = asyncio.run(main(URL))
+    print(date)
