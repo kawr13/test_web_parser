@@ -1,4 +1,5 @@
 # Асинхронный веб-скраппер для извлечения данных с веб-страниц
+
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup as bs
