@@ -49,8 +49,5 @@ async def main(url: str):
     sites_dat.extend(results)
     await file_save(sites_dat)
 
-if __name__ == "__main__":
-    answ = 'python'
-    URL = rf'https://habr.com/ru/search/?q={answ}&target_type=posts&order=relevance'
-    asyncio.run(main(URL))
+
     
