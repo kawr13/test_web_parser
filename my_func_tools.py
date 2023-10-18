@@ -36,7 +36,7 @@ async def file_save(data: list):
     async with aiofiles.open('data.json', 'w', encoding='utf-8') as f:
         await f.write(str(data))
 
-async def main(url: str):
+асинк def main(url: str):
     sites_dat = []
     sites_data = await scrap(url)
     data = await extract_urls(sites_data)
