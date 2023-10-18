@@ -36,7 +36,7 @@ async def file_save(data: list):
     async with aiofiles.open('data.json', 'w', encoding='utf-8') as f:
         await f.write(str(data))
 
-асинк def main(url: str):
+async def main(url: str):
     sites_dat = []
     sites_data = await scrap(url)
     data = await extract_urls(sites_data)
@@ -49,6 +49,8 @@ async def file_save(data: list):
     sites_dat.extend(results)
     await file_save(sites_dat)
 
-for name in main:
-    print(name)
+if __name__ == "__main__":
+    answ = 'python'
+    URL = rf'https://habr.com/ru/search/?q={answ}&target_type=posts&order=relevance'
+    asyncio.run(main(URL))
     
