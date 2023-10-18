@@ -49,5 +49,6 @@ async def main(url: str):
     sites_dat.extend(results)
     await file_save(sites_dat)
 
-
+for name in main:
+    print(name)
     
